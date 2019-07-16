@@ -1,0 +1,13 @@
+---
+# vars file for gnupg
+_gnupg_packages:
+  default:
+    - gnupg
+  Archlinux:
+    - gnupg
+  openSUSE Leap:
+    - gnupg
+
+gnupg_packages: "{{ _gnupg_packages[ansible_distribution] | default(_gnupg_packages['default']) }}"
+
+

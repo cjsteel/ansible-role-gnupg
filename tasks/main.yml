@@ -1,0 +1,41 @@
+#- name: yum install gnupg
+#  yum: pkg=gnupg state=latest
+#  when: ansible_pkg_mgr == 'yum'
+#- name: brew install gnupg
+#  homebrew: name=gnupg state=present
+#  become: true
+#  become_user: "{{ gnupg_user }}"
+#  when: ansible_pkg_mgr == 'homebrew'
+- name: Ensure gnupg packages are installed
+  package:
+    name: "{{ gnupg_packages }}"
+    state: present
+  register: gnupg_install_gnupg
+  until: gnupg is succeeded
+  retries: 3
+
+- name: Create gnupg configuration directory
+  file:
+    path: "{{ gnupg_config_directory }}"
+    owner: "{{ gnupg_user }}"
+    group: "{{ gnupg_group }}"
+    mode: 0700
+    state: directory
+  tags: [ gnupg ]
+
+- name: Configure gpg
+  template:
+    src: gpg.conf
+    dest: "{{ gnupg_config_file }}"
+    owner: "{{ gnupg_user }}"
+    group: "{{ gnupg_group }}"
+  tags: [ gnupg ]
+
+
+- name: Configure gpg-agent
+  template:
+    src: gpg-agent.conf
+    dest: "{{ gnupg_agent_config_file }}"
+    owner: "{{ gnupg_user }}"
+    group: "{{ gnupg_group }}"
+  tags: [ gnupg ]
